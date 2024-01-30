@@ -8,6 +8,7 @@ export const allUsers = async (req: Request, res: Response) => {
     res.status(200).json({
       user: users.map((user) => ({
         username: user.username,
+        email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         _id: user._id,
