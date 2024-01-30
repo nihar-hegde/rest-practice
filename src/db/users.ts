@@ -12,7 +12,21 @@ export const UserModel = mongoose.model("User", UserSchema);
 
 // User Actions
 
-export const getAllUsers = () => UserModel.find();
+export const getAllUsers = (filter: string) =>
+  UserModel.find({
+    $or: [
+      {
+        firstName: {
+          $regex: filter,
+        },
+      },
+      {
+        lastName: {
+          $regex: filter,
+        },
+      },
+    ],
+  });
 export const getUserByEmail = (email: string) => UserModel.findOne({ email });
 export const getUserById = (id: string) => UserModel.findById(id);
 export const createUser = (value: Record<string, any>) =>

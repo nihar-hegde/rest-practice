@@ -3,9 +3,15 @@ import { getAllUsers } from "../db/users";
 
 export const allUsers = async (req: Request, res: Response) => {
   try {
-    const users = await getAllUsers();
+    const filter = req.query.filter || "";
+    const users = await getAllUsers(filter as string);
     res.status(200).json({
-      users,
+      user: users.map((user) => ({
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+      })),
     });
   } catch (error) {
     console.log(error);
