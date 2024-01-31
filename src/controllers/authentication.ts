@@ -3,8 +3,13 @@ import z from "zod";
 import { createUser, getUserByEmail } from "../db/users";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const jwtSecret = "SuberSecretJwtBrowhwtkadjfhvalidwgfhlakwjdhglaksdh";
+dotenv.config();
+
+if (!process.env.JWT_SECRET) {
+  console.log("JWT SECRET NOT FOUND");
+}
 
 const signUpSchema = z.object({
   firstName: z.string(),
@@ -67,7 +72,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
     const { email, password } = req.body;
-    const user = await getUserByEmail(email);
+    const user = await getUserByEmail(email).select("+password");
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + 1);
     console.log(user);
@@ -82,7 +87,7 @@ export const login = async (req: Request, res: Response) => {
       }
       console.log(result);
       if (result) {
-        const token = jwt.sign({ email: user.email }, jwtSecret);
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET!);
         return res.status(200).json({ message: "Logged in", token: token });
       } else {
         return res.status(411).json({ message: "Error while logging in" });

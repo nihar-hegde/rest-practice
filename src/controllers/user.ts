@@ -21,3 +21,13 @@ export const allUsers = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const authCheck = async (req: Request, res: Response) => {
+  try {
+    res.status(200).json({
+      message: "Works i guess",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
