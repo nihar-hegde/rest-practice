@@ -68,6 +68,8 @@ export const login = async (req: Request, res: Response) => {
     }
     const { email, password } = req.body;
     const user = await getUserByEmail(email);
+    const expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 1);
     console.log(user);
     if (!user) {
       return res.status(404).json({
@@ -81,8 +83,7 @@ export const login = async (req: Request, res: Response) => {
       console.log(result);
       if (result) {
         const token = jwt.sign({ email: user.email }, jwtSecret);
-        res.cookie("AUTH", token, { domain: "localhost", path: "/" });
-        return res.status(200).json({ message: "Logged in" });
+        return res.status(200).json({ message: "Logged in", token: token });
       } else {
         return res.status(411).json({ message: "Error while logging in" });
       }
