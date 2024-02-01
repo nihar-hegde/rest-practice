@@ -7,7 +7,7 @@ const ProductSchema = new mongoose.Schema({
   tags: [String], // an array of strings
   images: [String], // an array of image urls
   quantity: { type: Number, required: true },
-  userid: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // a reference to the user who created the product
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // a reference to the user who created the product
 });
 
 export const ProductModel = mongoose.model("Product", ProductSchema);

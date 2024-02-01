@@ -18,8 +18,10 @@ export const createProductController = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid Input data" });
     }
     const data = req.body;
-    const productCreate = await createProduct(data);
-    console.log(productCreate);
+    const updateData = { ...data, userId: req.indentity._id };
+    console.log(updateData, "UPDATED DATA");
+    const productCreate = await createProduct(updateData);
+    console.log(productCreate, "CREATED PRODUCT");
     res.status(200).json({ message: "Product Created", productCreate });
   } catch (error) {
     console.log(error);

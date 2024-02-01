@@ -12,6 +12,7 @@ export const allUsers = async (req: Request, res: Response) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
         _id: user._id,
       })),
     });
