@@ -6,6 +6,8 @@ const UserSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   password: { type: String, required: true, select: false },
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  role: { type: String, enum: ["admin", "user"], default: "user" },
 });
 
 export const UserModel = mongoose.model("User", UserSchema);
