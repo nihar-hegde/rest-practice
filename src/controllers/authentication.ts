@@ -87,7 +87,10 @@ export const login = async (req: Request, res: Response) => {
       }
       console.log(result);
       if (result) {
-        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET!);
+        const token = jwt.sign(
+          { email: user.email, id: user._id },
+          process.env.JWT_SECRET!,
+        );
         return res.status(200).json({ message: "Logged in", token: token });
       } else {
         return res.status(411).json({ message: "Error while logging in" });

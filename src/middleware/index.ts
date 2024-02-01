@@ -2,13 +2,20 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
 import { getUserByEmail } from "../db/users";
+import { ObjectId } from "mongodb";
 
 dotenv.config();
+interface IdentidyI {
+  _id: string | ObjectId;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
 
 declare global {
   namespace Express {
     interface Request {
-      email: string | undefined;
+      indentity: IdentidyI;
     }
   }
 }
@@ -20,7 +27,7 @@ if (!process.env.JWT_SECRET) {
 export const isAuthenticated = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const authHeader = req.headers.authorization;
@@ -36,9 +43,9 @@ export const isAuthenticated = async (
       const exisitingUser = await getUserByEmail(email);
       console.log(exisitingUser);
       if (!exisitingUser) {
-        res.sendStatus(400).json({ message: "User not found" });
+        return res.sendStatus(400).json({ message: "User not found" });
       }
-      req.email = exisitingUser?.email;
+      req.indentity = exisitingUser;
       next();
     } catch (error) {
       console.log(error);
@@ -49,5 +56,31 @@ export const isAuthenticated = async (
   } catch (error) {
     console.log(error);
     res.sendStatus(400);
+  }
+};
+
+export const isOwner = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(403).json({
+        message: "You are not logged in!",
+      });
+    }
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const jwtid = (decoded as JwtPayload).id;
+    const id = req.indentity._id.toString();
+    if (jwtid !== id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
   }
 };
