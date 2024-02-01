@@ -1,15 +1,18 @@
 import express from "express";
-import { allUsers, authCheck, deleteUser } from "../controllers/user";
 import { isAdmin, isAuthenticated, isOwner } from "../middleware";
-import { createProductController } from "../controllers/products";
+import {
+  createProductController,
+  getAllProductsController,
+} from "../controllers/products";
 
 const productRouter = express.Router();
 
+productRouter.get("/all-products", getAllProductsController);
 productRouter.post(
   "/create",
   isAuthenticated,
   isAdmin,
-  createProductController
+  createProductController,
 );
 
 export default productRouter;

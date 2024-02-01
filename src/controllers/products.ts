@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createProduct } from "../db/products";
+import { createProduct, getAllProduct } from "../db/products";
 
 const ProductSchema = z.object({
   name: z.string(),
@@ -10,6 +10,19 @@ const ProductSchema = z.object({
   images: z.array(z.string()),
   quantity: z.number(),
 });
+export const getAllProductsController = async (req: Request, res: Response) => {
+  try {
+    const filter = req.query.filter || "";
+    const products = await getAllProduct(filter as string);
+    if (!products) {
+      res.status(404).json({ message: "NO Products found" });
+    }
+    res.status(200).json({ products });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
+  }
+};
 
 export const createProductController = async (req: Request, res: Response) => {
   try {
