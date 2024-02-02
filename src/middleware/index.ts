@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from "dotenv";
 import { getUserByEmail, getUserById } from "../db/users";
 import { ObjectId } from "mongodb";
+import { getProductById } from "../db/products";
 
 dotenv.config();
 interface IdentidyI {
@@ -41,7 +42,6 @@ export const isAuthenticated = async (
       const decoded = jwt.verify(token, process.env.JWT_SECRET!);
       const email = (decoded as JwtPayload).email;
       const exisitingUser = await getUserByEmail(email);
-      console.log(exisitingUser);
       if (!exisitingUser) {
         return res.sendStatus(400).json({ message: "User not found" });
       }
@@ -50,7 +50,7 @@ export const isAuthenticated = async (
     } catch (error) {
       console.log(error);
       res.status(400).json({
-        message: "Unauthorized",
+        message: "Unauthorized From isAuthenticated",
       });
     }
   } catch (error) {
@@ -76,7 +76,7 @@ export const isOwner = async (
     const jwtid = (decoded as JwtPayload).id;
     const id = req.indentity._id.toString();
     if (jwtid !== id) {
-      return res.status(403).json({ message: "Unauthorized" });
+      return res.status(403).json({ message: "Unauthorized from isOwner" });
     }
     next();
   } catch (error) {
@@ -93,18 +93,41 @@ export const isAdmin = async (
   try {
     const userId = req.indentity._id.toString();
     const user = await getUserById(userId);
-    console.log(user, "From isAdmin middleware");
     if (!user) {
-      return res.status(400).json({ message: "UnAuthorized" });
+      return res.status(400).json({ message: "UnAuthorized from isAdmin" });
     }
     if (user.role !== "admin") {
       return res.status(401).send({
         success: false,
-        message: "UnAuthorized Access",
+        message: "UnAuthorized Access from isAdmin",
       });
     } else {
       next();
     }
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
+  }
+};
+
+export const isProductOwner = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.indentity._id.toString();
+    const prductId = req.params.id;
+    const getProduct = await getProductById(prductId);
+    if (!getProduct) {
+      return res.status(400).json({ message: "Product Not Found" });
+    }
+    if (userId !== getProduct.userId?.toString()) {
+      return res
+        .status(400)
+        .json({ message: "UnAuthorized from isProductOwner" });
+    }
+    next();
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: error });

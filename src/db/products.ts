@@ -34,7 +34,7 @@ export const createProduct = (value: Record<string, any>) =>
   ProductModel.create(value);
 
 export const deleteProductById = (id: string) =>
-  ProductModel.findOneAndDelete({ _id: id });
+  ProductModel.findByIdAndDelete({ _id: id });
 
 export const updateProductById = (id: string, value: Record<string, any>) =>
   ProductModel.findByIdAndUpdate(id, value);

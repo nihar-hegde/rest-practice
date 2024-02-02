@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { createProduct, getAllProduct } from "../db/products";
+import {
+  createProduct,
+  deleteProductById,
+  getAllProduct,
+} from "../db/products";
 
 const ProductSchema = z.object({
   name: z.string(),
@@ -36,6 +40,19 @@ export const createProductController = async (req: Request, res: Response) => {
     const productCreate = await createProduct(updateData);
     console.log(productCreate, "CREATED PRODUCT");
     res.status(200).json({ message: "Product Created", productCreate });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error });
+  }
+};
+
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const productId = req.params.id;
+    const deleteProduct = await deleteProductById(productId);
+    res
+      .status(200)
+      .json({ message: "PRduct deleted you test yo", deleteProduct });
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: error });
